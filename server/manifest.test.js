@@ -5,10 +5,12 @@ import manifest, { startQuickSession, waitOnBoard } from './manifest.js';
 
 const fakeHost = ({ sessions = [], agents = [{ id: 'claude', available: true, models: [{ value: 'opus', default: true }] }] } = {}) => {
   const spawned = [];
+  let onBoard = false;
   return {
     spawned,
+    rebuild: async () => { onBoard = true; },
     agents: { list: async () => agents },
-    sessions: { list: () => sessions, get: (id) => (spawned.length && id === 'new-1' ? { status: 'idle' } : null), spawn: async (opts) => { spawned.push(opts); return { sessionId: 'new-1' }; } },
+    sessions: { list: () => sessions, get: (id) => (onBoard && id === 'new-1' ? { status: 'idle' } : null), spawn: async (opts) => { spawned.push(opts); return { sessionId: 'new-1' }; } },
   };
 };
 
@@ -24,6 +26,14 @@ test('start spawns in the task\'s usual folder with the default agent and model,
   const host = fakeHost({ sessions: [{ taskId: 't1', cwd: '/r/a' }, { taskId: 't1', cwd: '/r/a' }, { taskId: 't2', cwd: '/r/b' }] });
   assert.deepEqual(await startQuickSession({ taskId: 't1' }, host), { sessionId: 'new-1', cwd: '/r/a', onBoard: true });
   assert.deepEqual(host.spawned, [{ agent: 'claude', model: 'opus', cwd: '/r/a', taskId: 't1' }]);
+});
+
+test('start rebuilds the board straight away rather than waiting for the periodic rebuild', async () => {
+  const host = fakeHost();
+  let sleeps = 0;
+  const res = await startQuickSession({ taskId: null }, host, { sleep: async () => { sleeps++; } });
+  assert.equal(res.onBoard, true);
+  assert.equal(sleeps, 0, 'the card is on the board as soon as the rebuild returns');
 });
 
 test('start for Unassigned or a task with no sessions leaves the folder blank for a fresh scratch folder', async () => {

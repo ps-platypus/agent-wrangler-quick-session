@@ -30,6 +30,9 @@ export async function startQuickSession(msg, host, opts) {
   if (!launch) throw new Error('No agent CLI is installed on this machine.');
   const cwd = usualFolder(host.sessions.list(), taskId);
   const result = await host.sessions.spawn({ ...launch, ...(cwd ? { cwd } : {}), ...(taskId ? { taskId } : {}) });
+  // Rebuild the board now, as the dialog's own dispatch does, instead of
+  // waiting for the next periodic rebuild (every 4s) to draw the card.
+  await host.rebuild().catch(() => {});
   const onBoard = await waitOnBoard(host, result.sessionId, opts);
   return { sessionId: result.sessionId, cwd: cwd || null, onBoard };
 }
@@ -39,7 +42,7 @@ export default {
   label: 'Quick session',
   description: 'Adds a button to each task\'s title bar that starts a session in that task straight away, in the task\'s usual folder with the default model, skipping the dispatch dialog.',
   author: 'Victoria Xiao',
-  requires: ['sessions:read', 'sessions:spawn', 'agents:read'],
+  requires: ['sessions:read', 'sessions:spawn', 'agents:read', 'board:rebuild'],
   engines: { wranglerApi: '^2.2.0' },
   boardApi: '^2.2.0',
   defaultEnabled: true,

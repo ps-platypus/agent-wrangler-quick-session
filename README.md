@@ -28,6 +28,7 @@ local checkout instead, copy it to `<AW_DATA_DIR>/extensions/quick-session/` and
 | `sessions:read` | Finds the folder the task's sessions use. |
 | `sessions:spawn` | Starts the session. |
 | `agents:read` | Finds the default agent and model. |
+| `board:rebuild` | Draws the new card at once, so it can be opened without waiting for the next board refresh. |
 
 ## Develop
 

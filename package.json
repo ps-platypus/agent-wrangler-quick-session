@@ -16,7 +16,8 @@
     "requires": [
       "sessions:read",
       "sessions:spawn",
-      "agents:read"
+      "agents:read",
+      "board:rebuild"
     ],
     "engines": { "wranglerApi": "^2.2.0" }
   },
