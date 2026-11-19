@@ -1,0 +1,26 @@
+{
+  "name": "agent-wrangler-quick-session",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A button on each Agent Wrangler task's title bar that starts a session in that task at once, without the dispatch dialog",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test"
+  },
+  "wranglerExtension": {
+    "id": "quick-session",
+    "label": "Quick session",
+    "description": "Adds a button to each task's title bar that starts a session in that task straight away, in the task's usual folder with the default model, skipping the dispatch dialog.",
+    "author": "Victoria Xiao",
+    "requires": [
+      "sessions:read",
+      "sessions:spawn",
+      "agents:read"
+    ],
+    "engines": { "wranglerApi": "^2.2.0" }
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
